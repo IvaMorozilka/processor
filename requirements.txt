@@ -1,4 +1,5 @@
 pandas
 fastapi[standard]
 boto3
-pyarrow
+python-multipart
+openpyxl
