@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  worker:
+    build: .
+    volumes:
+      - ./app:/code/app
+    networks:
+      - etl_network
+
+  dremio:
+    image: dremio/dremio-oss:latest
+    ports:
+      - "9047:9047" # Web UI
+      - "31010:31010" # Client connection
+      - "45678:45678" # Inter-node communication
+    volumes:
+      - dremio_data:/opt/dremio/data
+    environment:
+      - DREMIO_MAX_MEMORY_SIZE_MB=4096
+    networks:
+      - etl_network
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000" # API
+      - "9001:9001" # Console
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    command: server /data --console-address ":9001"
+    networks:
+      - etl_network
+
+networks:
+  etl_network:
+    driver: bridge
+
+volumes:
+  dremio_data:
+  minio_data:
