@@ -2,3 +2,4 @@ __pycache__/
 .env
 dremio_data
 minio_data
+*.ipynb
