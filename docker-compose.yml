@@ -15,7 +15,7 @@ services:
       - "31010:31010" # Client connection
       - "45678:45678" # Inter-node communication
     volumes:
-      - dremio_data:/opt/dremio/data
+      - ./dremio_data:/opt/dremio/data
     environment:
       - DREMIO_MAX_MEMORY_SIZE_MB=4096
     networks:
@@ -27,7 +27,7 @@ services:
       - "9000:9000" # API
       - "9001:9001" # Console
     volumes:
-      - minio_data:/data
+      - ./minio_data:/data
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
