@@ -1,5 +1,8 @@
 __pycache__/
-.env
+*.env
 dremio_data
 minio_data
 *.ipynb
+*.toml
+test/
+.vscode
