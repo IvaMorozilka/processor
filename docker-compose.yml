@@ -1,10 +1,13 @@
-version: '3'
-
 services:
   worker:
-    build: .
+    build:
+      context: ./app
+    ports:
+      - "8000:8000"
     volumes:
       - ./app:/code/app
+    env_file:
+      - secrets.env
     networks:
       - etl_network
 
@@ -13,6 +16,7 @@ services:
     ports:
       - "9047:9047" # Web UI
       - "31010:31010" # Client connection
+      - "32010:32010"
       - "45678:45678" # Inter-node communication
     volumes:
       - ./dremio_data:/opt/dremio/data
