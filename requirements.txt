@@ -1,5 +1,0 @@
-pandas
-fastapi[standard]
-boto3
-python-multipart
-openpyxl
