@@ -73,21 +73,21 @@ def humanitarian_aid(df: pd.DataFrame):
         ],
     }
 
-    helpers.prepare(df)
-    not_replaced_values = helpers.classification(
+    df = helpers.prepare(df)
+    df = helpers.classification(
         df,
         rename_data,
         "Наименование материальны средств (оказанных услуг)",
         "Что передали",
     )
-    helpers.null_replacement(
+    df = helpers.null_replacement(
         df,
         {
             "Марка, модель передаваемых материальных средств": "-",
             "Сведения о контрагенте (наименование организации, телефон, сайт)": "-",
         },
     )
-    helpers.type_conversion(
+    df = helpers.type_conversion(
         df,
         {
             "Кол-во переданного имущества": "Int64",
@@ -120,23 +120,25 @@ def humanitarian_aid(df: pd.DataFrame):
         "по городу Санкт-Петербургу": "по г. СПБ",
     }
 
-    helpers.multi_replace(df, "Отправитель заявки", voen_regex)
-    helpers.multi_replace(df, "Кому передано имущество (оказаны услуги)", voen_regex)
-    helpers.multi_replace(
+    df = helpers.multi_replace(df, "Отправитель заявки", voen_regex)
+    df = helpers.multi_replace(
+        df, "Кому передано имущество (оказаны услуги)", voen_regex
+    )
+    df = helpers.multi_replace(
         df, "ОИВ субъекта РФ (организация), осуществляющая закупку", oiv_regex
     )
-    helpers.multi_replace(
+    df = helpers.multi_replace(
         df,
         "Сведения о контрагенте (наименование организации, телефон, сайт)",
         oiv_regex,
     )
-    helpers.uppercase_first_letter(
+    df = helpers.uppercase_first_letter(
         df, "Наименование материальны средств (оказанных услуг)"
     )
-    helpers.uppercase_first_letter(
+    df = helpers.uppercase_first_letter(
         df, "ОИВ субъекта РФ (организация), осуществляющая закупку"
     )
-    helpers.uppercase_first_letter(
+    df = helpers.uppercase_first_letter(
         df, "Сведения о контрагенте (наименование организации, телефон, сайт)"
     )
     df["Кол-во не реализованного по заявке имущества"] = (
@@ -148,7 +150,7 @@ def humanitarian_aid(df: pd.DataFrame):
     df["Месяц"] = df["Дата передачи имущества"].dt.month.astype(str)
 
     # Получаем название месяца
-    helpers.set_month_names(df, "Месяц", "Месяц_назв")
+    df = helpers.set_month_names(df, "Месяц", "Месяц_назв")
 
     # Получаем Сколько запросили в еденицах и Сколько передали в еденицах
     df["Сколько запросили в еденицах"] = (
@@ -174,10 +176,10 @@ def humanitarian_aid(df: pd.DataFrame):
     df_d3["Год"] = "Все года"
 
     df = pd.concat([df, df_d, df_d2, df_d3], ignore_index=True)
+    return df
 
 
 def procces_df(df: pd.DataFrame, file_name: str):
-    df_copy = df.copy()
     if file_name == "ГуманитарнаяПомощьСВО":
-        humanitarian_aid(df_copy)
-    return df_copy
+        df = humanitarian_aid(df)
+    return df
