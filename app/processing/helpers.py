@@ -1,6 +1,8 @@
 import pandas as pd
 import re
 from datetime import datetime
+from typing import Literal
+from pathlib import Path
 
 
 def multi_replace(
@@ -65,10 +67,23 @@ def classification(
     return df_copy
 
 
-def null_replacement(df: pd.DataFrame, replace_dict: dict) -> pd.DataFrame:
+def null_replacement(
+    df: pd.DataFrame,
+    replace_dict: dict | None = None,
+    mode: Literal["column", "type"] = "column",
+) -> pd.DataFrame:
     df_copy = df.copy()
-    for column, replace_with in replace_dict.items():
-        df_copy[column] = df_copy[column].fillna(value=replace_with)
+    if mode == "column":
+        for column, replace_with in replace_dict.items():
+            df_copy[column] = df_copy[column].fillna(value=replace_with)
+    else:
+        for column in df_copy.columns:
+            if pd.api.types.is_numeric_dtype(df_copy[column]):
+                df_copy[column] = df_copy[column].fillna(0)
+            elif pd.api.types.is_string_dtype(
+                df_copy[column]
+            ) or pd.api.types.is_object_dtype(df_copy[column]):
+                df_copy[column] = df_copy[column].fillna("-")
     return df_copy
 
 
@@ -120,3 +135,34 @@ def extract_month_and_year(file_name: str):
     date = datetime.strptime(str_date, "%d-%m-%Y")
     month, year = date.month, date.year
     return month_names[month], year
+
+
+def parse_filename(filename: str, save_extension: Literal["parquet"] = None):
+    """
+    Парсит имя файла для получения пути сохранения.
+
+    Пример: something_06-06-2021.xlsx -> something/2021/06/something_06-06-2021.xlsx
+    """
+    try:
+        # Ищем дату в формате DD-MM-YYYY в имени файла
+        match = re.search(r"(.+)_(\d{2})-(\d{2})-(\d{4})\.(xlsx|csv)$", filename)
+
+        if match:
+            prefix = match.group(1)
+            day = match.group(2)
+            month = match.group(3)
+            year = match.group(4)
+            extension = match.group(5)
+
+            # Формируем путь: prefix/year/month/original_filename
+            if not save_extension:
+                return f"{prefix}/{year}/{month}/{filename}"
+            return f"{prefix}/{year}/{month}/{Path(filename).stem}.{save_extension}"
+        else:
+            # Если не удалось распарсить, используем prefix/ как путь
+            prefix = filename.split("_")[0] if "_" in filename else "chore"
+            if not save_extension:
+                return f"{prefix}/{filename}"
+            return f"{prefix}/{Path(filename).stem}.{save_extension}"
+    except Exception:
+        return f"chore/{filename}"

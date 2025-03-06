@@ -1,6 +1,6 @@
 import processing.helpers as helpers
+from processing.constants import EN_HASVO_COLS
 import pandas as pd
-import io
 
 
 def humanitarian_aid(df: pd.DataFrame):
@@ -80,20 +80,13 @@ def humanitarian_aid(df: pd.DataFrame):
         "Наименование материальны средств (оказанных услуг)",
         "Что передали",
     )
-    df = helpers.null_replacement(
-        df,
-        {
-            "Марка, модель передаваемых материальных средств": "-",
-            "Сведения о контрагенте (наименование организации, телефон, сайт)": "-",
-        },
-    )
+    df = helpers.null_replacement(df, mode="type")
     df = helpers.type_conversion(
         df,
         {
+            "№ п/п": "int64",
             "Кол-во переданного имущества": "Int64",
             "Кол-во не реализованного по заявке имущества": "Int64",
-            "№ п/п": "int64",
-            "Месяц": "int64",
         },
     )
 
@@ -119,7 +112,6 @@ def humanitarian_aid(df: pd.DataFrame):
         "по Санкт-Петербургу": "по г. СПБ",
         "по городу Санкт-Петербургу": "по г. СПБ",
     }
-
     df = helpers.multi_replace(df, "Отправитель заявки", voen_regex)
     df = helpers.multi_replace(
         df, "Кому передано имущество (оказаны услуги)", voen_regex
@@ -145,9 +137,15 @@ def humanitarian_aid(df: pd.DataFrame):
         df["Потребность по поступившей заявке в/ч"] - df["Кол-во переданного имущества"]
     )
 
-    # Получаем год и месяц
     df["Год"] = df["Дата передачи имущества"].dt.year.astype(str)
     df["Месяц"] = df["Дата передачи имущества"].dt.month.astype(str)
+
+    df = helpers.type_conversion(
+        df,
+        {
+            "Месяц": "int64",
+        },
+    )
 
     # Получаем название месяца
     df = helpers.set_month_names(df, "Месяц", "Месяц_назв")
@@ -176,10 +174,16 @@ def humanitarian_aid(df: pd.DataFrame):
     df_d3["Год"] = "Все года"
 
     df = pd.concat([df, df_d, df_d2, df_d3], ignore_index=True)
+    df.rename(
+        columns=EN_HASVO_COLS,
+        inplace=True,
+    )
+    # for row in df.to_dict(orient="records"):  # Итерируемся по строкам
+    #     yield row
     return df
 
 
 def procces_df(df: pd.DataFrame, file_name: str):
     if file_name == "ГуманитарнаяПомощьСВО":
-        df = humanitarian_aid(df)
+        return humanitarian_aid(df)
     return df
