@@ -14,5 +14,5 @@
   * **pandas**: Для обработки сырых файлов в готовый parquet
 
 ## Принцип работы
-![image](process.drawio.svg)
 
+![image](process.drawio.svg)
