@@ -72,16 +72,7 @@ def minio_source(dataset_name: str):
         parquet_reader.apply_hints(write_disposition="replace")
         return parquet_reader.with_name("all_data")
 
-        # return dlt.resource(
-        #     humanitarian_aid(df),
-        #     name="test_table",
-        #     table_name="aboba",
-        #     write_disposition={
-        #         "disposition": "merge",
-        #         "strategy": "scd2",
-        #         "validity_column_name": ["from", "to"],
-        #     },
-        # )
+    return None
 
 
 # Функция для запуска DLT пайплайна
