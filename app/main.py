@@ -83,8 +83,8 @@ async def handle_delete(request: Request):
 @app.post("/run_pipeline")
 async def run_pipeline(request: Request):
     event_data = await request.json()
-    object_key = urllib.parse.unquote(
-        (event_data.get("Records", [{}])[0].get("s3", {}).get("object", {}).get("key"))
+    object_key = (
+        event_data.get("Records", [{}])[0].get("s3", {}).get("object", {}).get("key")
     )
 
     dataset_name = Path(object_key).parts[0]

@@ -40,7 +40,7 @@ def update_table_metadata(dataset_name: str):
         "Authorization": f"_dremio{os.environ.get('DREMIO_TOKEN')}",
     }
 
-    sql_query = f'ALTER TABLE Datasets."{dataset_name}"."all_data" REFRESH METADATA'
+    sql_query = f'ALTER TABLE Datasets."{EN_TABLE_NAMES_NORMALIZED[dataset_name]}"."all_data" REFRESH METADATA'
     payload = {"sql": sql_query}
     try:
         response = requests.post(
