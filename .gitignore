@@ -1,6 +1,7 @@
 __pycache__/
 *.env
 dremio_data
+postgres_data
 minio_data
 *.ipynb
 *.toml

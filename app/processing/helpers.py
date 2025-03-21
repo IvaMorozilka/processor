@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from typing import Literal
 from pathlib import Path
+import os
 
 
 def multi_replace(
@@ -166,3 +167,15 @@ def parse_filename(filename: str, save_extension: Literal["parquet"] = None):
             return f"{prefix}/{Path(filename).stem}.{save_extension}"
     except Exception:
         return f"chore/{filename}"
+
+
+def create_bucket_file_path(dasboard_name: str, original_file_name: str):
+    now = datetime.now()
+    file_name = Path(original_file_name).stem.strip().replace(" ", "+")
+    file_ext = os.path.splitext(original_file_name)[1]
+    year = now.year
+    month = now.month
+    day = now.day
+    if dasboard_name:
+        return f"{dasboard_name}/{year}/{month}/{file_name}_day{day}_id{now.timestamp():.0f}{file_ext}"
+    return f"trash/{original_file_name}"
