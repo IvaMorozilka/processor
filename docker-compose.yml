@@ -13,6 +13,7 @@ services:
     networks:
       - etl_network
       - shared_network
+    restart: always
   db:
     image: postgres:alpine
     env_file:
@@ -23,6 +24,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - etl_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   dremio:
     image: dremio/dremio-oss:20.1.0
@@ -50,6 +57,7 @@ services:
     command: server /data --console-address ":9001"
     networks:
       - etl_network
+    restart: always
 
 networks:
   etl_network:
